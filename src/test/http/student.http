@@ -1,0 +1,83 @@
+###
+POST localhost:8080/api/open/login
+Content-Type: application/json
+
+{
+  "account": "2022223893",
+  "password": "2022223893"
+}
+
+> {%
+    client.global.set("token", response.headers.valueOf("token"));
+    client.global.set("role", response.headers.valueOf("role"));
+%}
+###
+GET localhost:8080/api/info
+role: {{role}}
+token: {{token}}
+
+###
+GET localhost:8080/api/student/items/1398318844717629440
+role: {{role}}
+token: {{token}}
+
+###
+GET localhost:8080/api/student/topitems
+role: {{role}}
+token: {{token}}
+
+###
+#POST localhost:8080/api/student/studentitems
+#role: {{role}}
+#token: {{token}}
+#Content-Type: multipart/form-data; boundary=WebAppBoundary
+#
+#--WebAppBoundary
+#Content-Disposition: form-data; name="name";
+#Content-Type: text/plain
+#
+#英语六级
+#--WebAppBoundary
+#Content-Disposition: form-data; name="itemid";
+#Content-Type: text/plain
+#
+#1399783767003955200
+#--WebAppBoundary
+#Content-Disposition: form-data; name="comment";
+#Content-Type: text/plain
+#
+#
+#--WebAppBoundary
+#Content-Disposition: form-data; name="uploadFile"; filename="settings.xml"
+#Content-Type: */*
+#
+#< D:/settings.xml
+#--WebAppBoundary--
+POST localhost:8080/api/student/studentitems
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "美国国际交流",
+  "comment": "6个月",
+  "itemId": "1399783488883851264",
+  "rootItemId": "1399760678044106752"
+}
+
+###
+POST localhost:8080/api/student/studentitems/1400539958898393088/files
+role: {{role}}
+token: {{token}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="uploadFile"; filename="外语能力10-settings.xml"
+Content-Type: */*
+
+< D:/settings.xml
+--WebAppBoundary--
+###
+GET localhost:8080/api/student/studentitems/all
+role: {{role}}
+token: {{token}}

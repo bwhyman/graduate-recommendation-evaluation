@@ -1,0 +1,16 @@
+###
+GET http://localhost:8080/api/open/colleges
+
+### register
+POST localhost:8080/api/open/register
+Content-Type: application/json
+
+{
+  "account": "2022223893",
+  "name": "张雅楠",
+  "collId": "1397954199536336896",
+  "majorId": "1398200211232325632",
+  "catId": "1397992599949737984",
+  "student": "{\"score\": 91.90, \"ranking\": 5}"
+}
+###

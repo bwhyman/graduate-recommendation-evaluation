@@ -1,0 +1,127 @@
+### 学院管理员
+POST localhost:8080/api/open/login
+Content-Type: application/json
+
+{
+  "account": "1000002720",
+  "password": "1000002720"
+}
+
+> {%
+    client.global.set("token", response.headers.valueOf("token"));
+    client.global.set("role", response.headers.valueOf("role"));
+%}
+
+### 类别负责人
+POST localhost:8080/api/open/login
+Content-Type: application/json
+
+{
+  "account": "2022223007",
+  "password": "2022223007"
+}
+
+> {%
+    client.global.set("token", response.headers.valueOf("token"));
+    client.global.set("role", response.headers.valueOf("role"));
+%}
+
+### COLLAGE_ADMIN
+GET localhost:8080/api/college/categories
+role: {{role}}
+token: {{token}}
+
+###
+POST localhost:8080/api/college/categories
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "计算机类",
+  "weighting": "{\"score\": 0.85, \"compositeScore\": 0.15}",
+  "collId": "1397954199536336896"
+}
+
+###
+POST localhost:8080/api/college/majors
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "软件工程专业",
+  "catId": "1397992599949737984"
+}
+
+###
+POST localhost:8080/api/college/majors
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "自动化专业",
+  "catId": "1397990712034787328"
+}
+
+### 添加类别负责人
+POST localhost:8080/api/college/users
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "account": "2022223007",
+  "name": "宋焕宇",
+  "catIds": ["1397990712034787328"]
+}
+
+###
+GET localhost:8080/api/college/categories/1397992599949737984/items
+role: {{role}}
+token: {{token}}
+
+###
+GET localhost:8080/api/college/categories/1397992599949737984/items/1398318844717629440
+role: {{role}}
+token: {{token}}
+
+### 一级
+POST localhost:8080/api/college/items
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "学术专长",
+  "point": 50,
+  "maxPoints": 50,
+  "catId": "1397992599949737984"
+}
+### 二级
+POST localhost:8080/api/college/items
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "与学业相关的国内外高水平学科竞赛（仅限一项代表作）",
+  "maxPoints": 50,
+  "parentId": "1399618224682762240",
+  "catId": "1399618224682762240",
+  "comment": "dd"
+}
+### 三级
+POST localhost:8080/api/college/items
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "第一等级（二等奖）",
+  "maxPoints": 40,
+  "parentId": "1398322693683609600",
+  "catId": "1397990712034787328"
+}
+###

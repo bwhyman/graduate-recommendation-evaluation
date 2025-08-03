@@ -1,0 +1,18 @@
+database-name: 'grad_evaluation'
+spring:
+  profiles:
+    active: dev
+  sql:
+    init:
+      mode: always
+
+  jackson:
+    default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+
+logging:
+  pattern:
+    console: '%-5level %C.%M[%line] - %msg%n'

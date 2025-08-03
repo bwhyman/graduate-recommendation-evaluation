@@ -1,0 +1,21 @@
+spring:
+  r2dbc:
+    url: 'r2dbcs:mysql://${dhost}/${database-name}'
+    username: ${dusername}
+    password: ${dpassword}
+    pool:
+      enabled: true
+      max-size: 200
+      initial-size: 1
+
+logging:
+  level:
+    root: warn
+    cn.nefu.ccec.graduaterecommendationevaluation: info
+  pattern:
+    file: '%-5level %C.%M[%line] - %msg%n'
+  file:
+    name: /home/logs.log
+my:
+  secretkey: ${secretkey}
+  upload: '/home/upload/'

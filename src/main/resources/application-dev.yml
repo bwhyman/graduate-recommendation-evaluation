@@ -1,0 +1,18 @@
+spring:
+  r2dbc:
+    url: 'r2dbcs:mysql://192.168.1.31:3306/${database-name}'
+    username: root
+    password: a1213a
+    pool:
+      enabled: true
+      initial-size: 1
+
+logging:
+  level:
+    root: info
+    cn.nefu.ccec.graduaterecommendationevaluation: debug
+    org.springframework.r2dbc: debug
+
+my:
+  secretkey: '636eac2574bcfdc0'
+  upload: 'E:/'

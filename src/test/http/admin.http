@@ -1,0 +1,39 @@
+POST localhost:8080/api/open/login
+Content-Type: application/json
+
+{
+  "account": "admin",
+  "password": "admin"
+}
+
+> {%
+    client.global.set("token", response.headers.valueOf("token"));
+    client.global.set("role", response.headers.valueOf("role"));
+%}
+
+###
+POST localhost:8080/api/admin/colleges
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "计控学院"
+}
+
+###
+GET localhost:8080/api/admin/colleges
+role: {{role}}
+token: {{token}}
+
+### 添加学院管理员
+POST localhost:8080/api/admin/users
+role: {{role}}
+token: {{token}}
+Content-Type: application/json
+
+{
+  "name": "王思迪",
+  "account": "2022212916",
+  "collId": "1397954199536336896"
+}
