@@ -32,7 +32,7 @@ public class UserService {
 
     public Mono<Void> updatePassword(long uid, String password) {
         return userRepository.updatePassword(uid, passwordEncoder.encode(password))
-        .as(transactionalOperator::transactional);
+                .as(transactionalOperator::transactional);
     }
 
     public Mono<Void> addCategoryAdmin(RegisterUserDTO registerUser) {
@@ -45,9 +45,9 @@ public class UserService {
                         .flatMap(catid -> userCategoryRepository.save(UserCategory.builder()
                                 .userId(u.getId())
                                 .catId(catid)
-                                .build())
-                        ).collectList()
-                ).then()
+                                .build()))
+                        .then()
+                )
                 .as(transactionalOperator::transactional);
     }
 

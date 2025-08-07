@@ -57,13 +57,6 @@ public class CategoryAdminController {
                 .map(ResultVO::success);
     }
 
-    /*@GetMapping("categories/{catid}/items/{itemid}")
-    public Mono<ResultVO> getItems(@PathVariable long catid,
-                                   @PathVariable long itemid) {
-        return itemService.listItems(catid, itemid)
-                .map(ResultVO::success);
-    }*/
-
     @GetMapping("students/{sid}/weightedscore")
     public Mono<ResultVO> getStudentWeightScore(
             @PathVariable long sid,

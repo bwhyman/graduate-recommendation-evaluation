@@ -31,17 +31,13 @@ create table if not exists `college`
 create table if not exists `weighted_score`
 (
     id          bigint primary key,
-    user_id     bigint           not null,
     score       decimal(6, 3)    not null check ( score > 0 and score <= 100.00),
     ranking     tinyint unsigned not null,
     comment     text             null,
     verified    tinyint unsigned not null default 0,
-    logs        json             null comment '[{name, comment}]',
 
     create_time datetime         not null default current_timestamp,
-    update_time datetime         not null default current_timestamp on update current_timestamp,
-
-    index (user_id)
+    update_time datetime         not null default current_timestamp on update current_timestamp
 );
 
 create table if not exists `weighted_score_log`

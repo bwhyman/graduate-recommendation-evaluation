@@ -15,11 +15,6 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
     Flux<Long> findCatIdsByCollId(long collid);
 
     @Query("""
-            select t1.cat_id from user_category t1 where t1.user_id=:uid
-            """)
-    Flux<Long> findCatIdsByUid(long uid);
-
-    @Query("""
             select * from category t1, user_category t2
             where t1.id=t2.cat_id and t2.user_id=:uid
             """)

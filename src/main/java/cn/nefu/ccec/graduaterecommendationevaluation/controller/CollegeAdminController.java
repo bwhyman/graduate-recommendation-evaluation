@@ -3,11 +3,9 @@ package cn.nefu.ccec.graduaterecommendationevaluation.controller;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Category;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Item;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Major;
+import cn.nefu.ccec.graduaterecommendationevaluation.dox.User;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.RegisterUserDTO;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.CategoryService;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.CollegeService;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.ItemService;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.UserService;
+import cn.nefu.ccec.graduaterecommendationevaluation.service.*;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.ResultVO;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.TokenAttribute;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +22,13 @@ public class CollegeAdminController {
     private final CollegeService collegeService;
     private final UserService userService;
     private final ItemService itemService;
+    private final AdminService adminService;
+
+    @GetMapping("categories/users")
+    public Mono<ResultVO> getUsers(@RequestAttribute(TokenAttribute.COLLID) long collid) {
+        return adminService.listAdmins(collid, User.CATEGORY_ADMIN)
+                .map(ResultVO::success);
+    }
 
     @PostMapping("users")
     public Mono<ResultVO> postCategoryAdmin(@RequestBody RegisterUserDTO registerUser,

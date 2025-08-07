@@ -37,6 +37,7 @@ jobs:
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
           source: "target/*.jar"
+          # /home/services/graduate-recommendation-evaluation/openjdk/
           target: ${{ secrets.TARGET }}
           # 仅复制文件，不复制目录
           strip_components: 1
@@ -48,6 +49,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
-          # cd /home/services/se-invigilation/
+          # cd /home/services/graduate-recommendation-evaluation/
           # docker compose up --force-recreate --no-deps -d openjdk
           script: ${{ secrets.RECREATE_CONTAINER }}

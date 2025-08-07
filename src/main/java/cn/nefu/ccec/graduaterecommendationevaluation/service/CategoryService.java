@@ -25,8 +25,6 @@ public class CategoryService {
     private final MajorRepository majorRepository;
     private final CollegeRepository collegeRepository;
     private final TransactionalOperator transactionalOperator;
-    private final UserRepository userRepository;
-
 
     @CacheEvict(value = "category", allEntries = true)
     public Mono<Void> addCategory(Category category) {
@@ -53,13 +51,6 @@ public class CategoryService {
                 .collectList()
                 .flatMap(this::listByCatids);
     }
-
-    public Mono<List<CategoryDTO>> listCategoryDTOsByuid(long uid) {
-        return categoryRepository.findCatIdsByUid(uid)
-                .collectList()
-                .flatMap(this::listByCatids);
-    }
-
 
     public Mono<List<Category>> listCategories(long uid) {
         return categoryRepository.findByUid(uid)
@@ -97,5 +88,4 @@ public class CategoryService {
         return majorRepository.findByCatId(uid,catid)
                 .collectList();
     }
-
 }
