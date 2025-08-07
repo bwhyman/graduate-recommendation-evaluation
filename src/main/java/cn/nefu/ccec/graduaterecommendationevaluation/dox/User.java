@@ -32,6 +32,7 @@ public class User {
     private String mobile;
     private Long collId;
     private Long majorId;
+    private Long catId;
 
     @ReadOnlyProperty
     private LocalDateTime createTime;

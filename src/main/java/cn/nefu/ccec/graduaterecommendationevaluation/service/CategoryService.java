@@ -1,18 +1,18 @@
 package cn.nefu.ccec.graduaterecommendationevaluation.service;
 
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Category;
-import cn.nefu.ccec.graduaterecommendationevaluation.dox.College;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Major;
-import cn.nefu.ccec.graduaterecommendationevaluation.dox.WeightedScore;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.CategoryDTO;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.CollegeDTO;
-import cn.nefu.ccec.graduaterecommendationevaluation.repository.*;
+import cn.nefu.ccec.graduaterecommendationevaluation.repository.CategoryRepository;
+import cn.nefu.ccec.graduaterecommendationevaluation.repository.CollegeRepository;
+import cn.nefu.ccec.graduaterecommendationevaluation.repository.MajorRepository;
+import cn.nefu.ccec.graduaterecommendationevaluation.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,27 +24,15 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final MajorRepository majorRepository;
     private final CollegeRepository collegeRepository;
+    private final TransactionalOperator transactionalOperator;
+    private final UserRepository userRepository;
 
 
-    @Transactional
     @CacheEvict(value = "category", allEntries = true)
     public Mono<Void> addCategory(Category category) {
         return categoryRepository.save(category)
-                .then();
-    }
-
-    public Mono<List<Long>> listCatIds(long collid) {
-        return categoryRepository.findCatIdsByCollId(collid)
-                .collectList();
-    }
-
-    /*public Mono<List<Long>> listCatIdsByUid(long uid) {
-        return categoryRepository.findCatIdsByUid(uid)
-                .collectList();
-    }*/
-
-    public Mono<Long> getCatIdByUid(long uid) {
-        return categoryRepository.findCatIdByUid(uid);
+                .then()
+                .as(transactionalOperator::transactional);
     }
 
     @Cacheable(value = "category", key = "#catid")
@@ -60,16 +48,22 @@ public class CategoryService {
                 ).cache();
     }
 
-    public Mono<List<CategoryDTO>> listCategories(long collid) {
+    public Mono<List<CategoryDTO>> listCategoryDTOs(long collid) {
         return categoryRepository.findCatIdsByCollId(collid)
                 .collectList()
                 .flatMap(this::listByCatids);
     }
 
-    public Mono<List<CategoryDTO>> listCategoriesByuid(long uid) {
+    public Mono<List<CategoryDTO>> listCategoryDTOsByuid(long uid) {
         return categoryRepository.findCatIdsByUid(uid)
                 .collectList()
                 .flatMap(this::listByCatids);
+    }
+
+
+    public Mono<List<Category>> listCategories(long uid) {
+        return categoryRepository.findByUid(uid)
+                .collectList();
     }
 
     private Mono<List<CategoryDTO>> listByCatids(List<Long> catids) {
@@ -93,12 +87,15 @@ public class CategoryService {
     }
 
     @CacheEvict(value = "category", allEntries = true)
-    @Transactional
     public Mono<Void> addMajor(Major major) {
         return majorRepository.save(major)
-                .then();
+                .then()
+                .as(transactionalOperator::transactional);
     }
 
-
+    public Mono<List<Major>> listMajors(long uid, long catid) {
+        return majorRepository.findByCatId(uid,catid)
+                .collectList();
+    }
 
 }

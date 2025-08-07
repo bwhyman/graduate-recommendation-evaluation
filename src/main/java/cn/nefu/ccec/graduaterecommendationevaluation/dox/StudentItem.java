@@ -18,9 +18,9 @@ import java.util.List;
 public class StudentItem {
 
     public interface Status {
-        String SUBMITTED = "av8c";
+        String PENDING_REVIEW = "av8c";
         String REJECTED = "ciG1";
-        String PENDING = "EmBq";
+        String PENDING_MODIFICATION = "EmBq";
         String CONFIRMED = "yJ3C";
     }
 

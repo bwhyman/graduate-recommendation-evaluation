@@ -9,11 +9,13 @@ create table if not exists `user`
     role        char(5)     not null,
     coll_id     bigint      null,
     major_id    bigint      null,
+    cat_id      bigint      null,
 
     create_time datetime    not null default current_timestamp,
     update_time datetime    not null default current_timestamp on update current_timestamp,
 
-    unique (account)
+    unique (account),
+    index (major_id)
 );
 
 create table if not exists `college`
@@ -40,6 +42,18 @@ create table if not exists `weighted_score`
     update_time datetime         not null default current_timestamp on update current_timestamp,
 
     index (user_id)
+);
+
+create table if not exists `weighted_score_log`
+(
+    id          bigint primary key,
+    student_id  bigint      not null,
+    user_id     bigint      not null,
+
+    comment     text        null,
+    create_time datetime    not null default current_timestamp,
+
+    index (student_id)
 );
 
 create table if not exists `category`
@@ -133,10 +147,10 @@ create table if not exists `student_item_file`
 create table if not exists `student_item_log`
 (
     id              bigint primary key,
-    student_item_id bigint   not null,
-    user_id         bigint   not null,
-    comment         text     null,
-    create_time     datetime not null default current_timestamp,
+    student_item_id bigint      not null,
+    user_id         bigint      not null,
+    comment         text        null,
+    create_time     datetime    not null default current_timestamp,
 
     index (student_item_id)
 );

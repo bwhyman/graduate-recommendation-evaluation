@@ -8,7 +8,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -17,8 +17,8 @@ import reactor.core.publisher.Mono;
 public class InitService {
     private final PasswordEncoder encoder;
     private final UserRepository userRepository;
+    private final TransactionalOperator transactionalOperator;
 
-    @Transactional
     @EventListener(classes = ApplicationReadyEvent.class)
     public Mono<Void> init() {
         var account = "admin";
@@ -34,6 +34,7 @@ public class InitService {
                         return userRepository.save(user).then();
                     }
                     return Mono.empty();
-                });
+                })
+                .as(transactionalOperator::transactional);
     }
 }

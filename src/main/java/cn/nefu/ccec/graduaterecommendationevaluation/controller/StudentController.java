@@ -5,7 +5,10 @@ import cn.nefu.ccec.graduaterecommendationevaluation.dox.StudentItemFile;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.WeightedScore;
 import cn.nefu.ccec.graduaterecommendationevaluation.exception.Code;
 import cn.nefu.ccec.graduaterecommendationevaluation.exception.XException;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.*;
+import cn.nefu.ccec.graduaterecommendationevaluation.service.FileService;
+import cn.nefu.ccec.graduaterecommendationevaluation.service.ItemService;
+import cn.nefu.ccec.graduaterecommendationevaluation.service.StudentItemService;
+import cn.nefu.ccec.graduaterecommendationevaluation.service.WeightedScoreService;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.ResultVO;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.TokenAttribute;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +48,7 @@ public class StudentController {
     @GetMapping("items/{parentitemid}")
     public Mono<ResultVO> getItems(@PathVariable long parentitemid,
                                    @RequestAttribute(TokenAttribute.CATID) long catid) {
-        return itemService.listItems(catid, parentitemid)
+        return itemService.listItemstest(catid, parentitemid)
                 .map(ResultVO::success);
 
     }
@@ -65,7 +68,7 @@ public class StudentController {
                     if (ws.getVerified() == WeightedScore.VERIFIED) {
                         return Mono.just(ResultVO.error(Code.ERROR, "成绩已认定，无法修改"));
                     }
-                    return weightedScoreService.updateWeightedScore(uid, weightedScore.getScore(), weightedScore.getRanking())
+                    return weightedScoreService.updateWeightedScore(uid, weightedScore.getScore(), weightedScore.getRanking(), WeightedScore.UNVERIFIED)
                             .thenReturn(ResultVO.success());
                 })
                 .switchIfEmpty(Mono.defer(() -> {
@@ -78,8 +81,9 @@ public class StudentController {
     }
 
 
-    @PostMapping("studentitems")
+    @PostMapping("studentitems/{rootitemid}")
     public Mono<ResultVO> postStudentItems(
+            @PathVariable long rootitemid,
             @RequestBody StudentItem studentItem,
             @RequestAttribute(TokenAttribute.UID) long uid,
             @RequestAttribute(TokenAttribute.CATID) long catid) {
@@ -89,12 +93,12 @@ public class StudentController {
                             .rootItemId(studentItem.getRootItemId())
                             .itemId(studentItem.getItemId())
                             .name(studentItem.getName())
-                            .status(StudentItem.Status.SUBMITTED)
+                            .status(StudentItem.Status.PENDING_REVIEW)
                             .userId(uid)
                             .comment(studentItem.getComment())
                             .build();
                     return studentItemService.addStudentItem(stuI)
-                            .then(Mono.defer(() -> studentItemService.listStudentItemDTOs(uid))
+                            .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid))
                                     .map(ResultVO::success));
                 }).defaultIfEmpty(ResultVO.error(Code.ERROR, "指标项不存在"));
     }
@@ -108,24 +112,30 @@ public class StudentController {
             @RequestAttribute(TokenAttribute.MAGORID) long majorid) {
 
         return studentItemService.getStudentItem(uid, stuitemid)
-                .flatMap(sutFile -> uploadFile
-                        .flatMap(filePart -> {
-                            var fileName = filePart.filename();
-                            if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
-                                log.warn("恶意上传包含路径的文件。用户ID：{}", uid);
-                                return Mono.error(XException.builder().codeN(Code.ERROR).message("上传文件错误").build());
+                .flatMap(sutFile -> {
+                            if (sutFile.getStatus().equals(StudentItem.Status.CONFIRMED)) {
+                                return Mono.error(XException.builder().codeN(Code.ERROR).message("指标项已认定，不可修改").build());
                             }
-                            return fileService.createAndGetRelativePath(majorid, uid)
-                                    .flatMap(relativePath -> fileService.saveFile(relativePath, filePart.filename(), filePart.content()));
-                        })
-                        .flatMap(path ->
-                                studentItemService.addStudentItemFile(StudentItemFile.builder()
-                                        .studentItemId(stuitemid)
-                                        .path(path.getParent().toString())
-                                        .filename(path.getFileName().toString())
-                                        .build()))
-                        .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
-                                .map(ResultVO::success)))
+                            return uploadFile
+                                    .flatMap(filePart -> {
+                                        var fileName = filePart.filename();
+                                        if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
+                                            log.warn("恶意上传包含路径的文件。用户ID：{}", uid);
+                                            return Mono.error(XException.builder().codeN(Code.ERROR).message("上传文件错误").build());
+                                        }
+                                        return fileService.createAndGetRelativePath(majorid, uid)
+                                                .flatMap(relativePath -> fileService.saveFile(relativePath, filePart.filename(), filePart.content()));
+                                    })
+                                    .flatMap(path ->
+                                            studentItemService.addStudentItemFile(StudentItemFile.builder()
+                                                    .studentItemId(stuitemid)
+                                                    .path(path.getParent().toString())
+                                                    .filename(path.getFileName().toString())
+                                                    .build()))
+                                    .flatMap(sf -> studentItemService.updateStatus(uid, StudentItem.Status.PENDING_REVIEW))
+                                    .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
+                                            .map(ResultVO::success)));
+                        }
                 )
                 .defaultIfEmpty(ResultVO.error(Code.ERROR, "指标项不存在"));
     }
@@ -135,13 +145,6 @@ public class StudentController {
     public Mono<ResultVO> getStudentItems(@PathVariable long rootitemid,
                                           @RequestAttribute(TokenAttribute.UID) long uid) {
         return studentItemService.listStudentItems(uid, rootitemid)
-                .map(ResultVO::success);
-    }
-
-    @Deprecated
-    @GetMapping("studentitems/all")
-    public Mono<ResultVO> getStudentItems(@RequestAttribute(TokenAttribute.UID) long uid) {
-        return studentItemService.listStudentItemDTOs(uid)
                 .map(ResultVO::success);
     }
 
@@ -200,8 +203,23 @@ public class StudentController {
             @PathVariable long stuitemid,
             @RequestBody StudentItem studentItem,
             @RequestAttribute(TokenAttribute.UID) long uid) {
-        return studentItemService.updateStudentItem(uid, stuitemid, studentItem.getName(), studentItem.getComment())
+        return studentItemService.updateStudentItem(uid, stuitemid, studentItem.getName(), studentItem.getComment(), StudentItem.Status.PENDING_REVIEW)
                 .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
                         .map(ResultVO::success)));
+    }
+
+    @GetMapping("statuses")
+    public Mono<ResultVO> getStatuses(@RequestAttribute(TokenAttribute.UID) long uid) {
+        return studentItemService.getStudentItemsInfo(uid)
+                .map(ResultVO::success)
+                .defaultIfEmpty(ResultVO.success(Map.of()));
+    }
+
+    @GetMapping("logs/{stuitemid}")
+    public Mono<ResultVO> getStudentItemLogs(
+            @PathVariable long stuitemid,
+            @RequestAttribute(TokenAttribute.UID) long uid) {
+        return studentItemService.listStudentItemLogs(uid, stuitemid)
+                .map(ResultVO::success);
     }
 }

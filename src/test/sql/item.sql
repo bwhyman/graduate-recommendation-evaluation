@@ -5,7 +5,7 @@ select * from item t1 where t1.cat_id=1397992599949737984 and t1.parent_id is nu
 
 explain
 with recursive t0 as (
-    select * from item t1 where t1.cat_id=1397992599949737984 and (1398318844717629440 IS NULL AND t1.parent_id IS NULL) OR (t1.parent_id = 1398318844717629440)
+    select * from item t1 where t1.cat_id=1397992599949737984 and t1.id=1399760678044106752
     union
     select t2.* from item t2 join t0 where t2.parent_id=t0.id
 )
@@ -28,4 +28,13 @@ with recursive t0 as (
 select * from t0, student_item t3 where t0.id=t3.item_id;
 
 explain
-select * from student_item t1 where t1.root_item_id=1399760678044106752 and t1.user_id=1399271139387179008
+select * from student_item t1 where t1.root_item_id=1399760678044106752 and t1.user_id=1399271139387179008;
+
+
+/**/
+with recursive t0 as (
+    select * from item t1 where t1.id=1399772739016916992
+    union
+    select t2.* from item t2 join t0 where t2.id=t0.parent_id
+)
+select * from t0;

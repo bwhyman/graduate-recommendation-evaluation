@@ -42,22 +42,16 @@ public class LoginController {
                     if (u.getCollId() != null) {
                         map.put(TokenAttribute.COLLID, u.getCollId());
                     }
-                    if(u.getMajorId() != null) {
+                    if (u.getMajorId() != null) {
                         map.put(TokenAttribute.MAGORID, u.getMajorId());
                     }
-                    if (u.getRole().equals(User.STUDENT)) {
-                        return categoryService.getCatIdByUid(u.getId())
-                                .map(cid -> {
-                                    map.put(TokenAttribute.CATID, cid);
-                                    response.getHeaders().add("role", u.getRole());
-                                    response.getHeaders().add("token", jwtComponent.encode(map));
-                                    return u;
-                                });
+                    if(u.getCatId() != null) {
+                        map.put(TokenAttribute.CATID, u.getCatId());
                     }
-                    return Mono.just(u);
-                })
-                .flatMap(u -> userService.getUserInfo(u.getId())
-                        .map(ResultVO::success))
+                    response.getHeaders().add("role", u.getRole());
+                    response.getHeaders().add("token", jwtComponent.encode(map));
+                    return userService.getUserInfo(u.getId());
+                }).map(ResultVO::success)
                 .defaultIfEmpty(ResultVO.error(Code.LOGIN_ERROR));
     }
 }

@@ -15,11 +15,19 @@ public interface ItemRepository extends ReactiveCrudRepository<Item, Long> {
             """)
     Flux<Item> findTopByCatId(long catid);
 
+    @Query("""
+            with recursive t0 as (
+                select * from item t1 where t1.cat_id=:catid
+                union
+                select t2.* from item t2 join t0 where t2.parent_id=t0.id
+            )
+            select * from t0;
+            """)
     Flux<Item> findByCatId(Long catid);
 
     @Query("""
             with recursive t0 as (
-                select * from item t1 where t1.cat_id=:catid and t1.parent_id=:parentid
+                select * from item t1 where t1.cat_id=:catid and t1.id=:parentid
                 union
                 select t2.* from item t2 join t0 where t2.parent_id=t0.id
             )

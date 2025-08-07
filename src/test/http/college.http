@@ -125,3 +125,8 @@ Content-Type: application/json
   "catId": "1397990712034787328"
 }
 ###
+GET localhost:8080/api/college/test
+role: {{role}}
+token: {{token}}
+
+###

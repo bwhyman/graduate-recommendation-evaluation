@@ -1,6 +1,5 @@
 package cn.nefu.ccec.graduaterecommendationevaluation.controller;
 
-import cn.nefu.ccec.graduaterecommendationevaluation.dox.User;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.RegisterUserDTO;
 import cn.nefu.ccec.graduaterecommendationevaluation.exception.Code;
 import cn.nefu.ccec.graduaterecommendationevaluation.service.CategoryService;

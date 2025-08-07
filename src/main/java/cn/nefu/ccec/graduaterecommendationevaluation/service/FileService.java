@@ -37,7 +37,7 @@ public class FileService {
 
     public Mono<Path> saveFile(Path relativePath, String fileName, Flux<DataBuffer> content) {
         var index = fileName.lastIndexOf(".");
-        var name = fileName.substring(0, index) + "-" +System.currentTimeMillis() +  fileName.substring(index);
+        var name = fileName.substring(0, index) + "-" + System.currentTimeMillis() + fileName.substring(index);
         var file = relativePath.resolve(name);
         return DataBufferUtils.write(content, Path.of(rootDirectory).resolve(file))
                 .thenReturn(file);

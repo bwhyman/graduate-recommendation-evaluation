@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -20,6 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserCategoryRepository userCategoryRepository;
+    private final TransactionalOperator transactionalOperator;
 
     public Mono<User> getUser(String account) {
         return userRepository.findByAccount(account);
@@ -29,12 +30,11 @@ public class UserService {
         return userRepository.find(id);
     }
 
-    @Transactional
     public Mono<Void> updatePassword(long uid, String password) {
-        return userRepository.updatePassword(uid, passwordEncoder.encode(password));
+        return userRepository.updatePassword(uid, passwordEncoder.encode(password))
+        .as(transactionalOperator::transactional);
     }
 
-    @Transactional
     public Mono<Void> addCategoryAdmin(RegisterUserDTO registerUser) {
         var newUser = new User();
         BeanUtils.copyProperties(registerUser, newUser);
@@ -47,10 +47,10 @@ public class UserService {
                                 .catId(catid)
                                 .build())
                         ).collectList()
-                ).then();
+                ).then()
+                .as(transactionalOperator::transactional);
     }
 
-    @Transactional
     public Mono<Void> addStudent(RegisterUserDTO registerUser) {
         var newUser = new User();
         BeanUtils.copyProperties(registerUser, newUser);
@@ -61,7 +61,8 @@ public class UserService {
                         .userId(u.getId())
                         .catId(registerUser.getCatId())
                         .build()))
-                .then();
+                .then()
+                .as(transactionalOperator::transactional);
     }
 
 }

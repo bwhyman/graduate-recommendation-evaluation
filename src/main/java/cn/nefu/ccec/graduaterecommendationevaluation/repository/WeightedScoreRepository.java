@@ -12,7 +12,10 @@ public interface WeightedScoreRepository extends ReactiveCrudRepository<Weighted
 
     @Modifying
     @Query("""
-            update weighted_score t1 set t1.score=:score, t1.ranking=:ranking where t1.id=:uid
+            update weighted_score t1
+            set t1.score=:score, t1.ranking=:ranking, t1.verified=:verified
+            where t1.id=:uid
             """)
-    Mono<Integer> updateWeightedScore(long uid, float score, int ranking);
+    Mono<Integer> updateWeightedScore(long uid, float score, int ranking, int verified);
+
 }
