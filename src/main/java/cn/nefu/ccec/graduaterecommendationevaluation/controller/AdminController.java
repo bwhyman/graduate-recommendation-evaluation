@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AdminController {
     private final AdminService adminService;
-    private final UserService userService;
 
     @PostMapping("colleges")
     public Mono<ResultVO> postCollege(@RequestBody College college) {

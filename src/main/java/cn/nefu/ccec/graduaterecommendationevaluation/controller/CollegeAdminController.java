@@ -50,8 +50,7 @@ public class CollegeAdminController {
     public Mono<ResultVO> addCategory(@RequestBody Category category,
                                       @RequestAttribute(TokenAttribute.COLLID) long collid) {
         return categoryService.addCategory(category)
-                .then(categoryService.listCategoryDTOs(collid))
-                .map(ResultVO::success);
+                .thenReturn(ResultVO.success());
     }
 
     // 添加专业
@@ -59,16 +58,14 @@ public class CollegeAdminController {
     public Mono<ResultVO> addMajor(@RequestBody Major major,
                                    @RequestAttribute(TokenAttribute.COLLID) long collid) {
         return categoryService.addMajor(major)
-                .then(categoryService.listCategoryDTOs(collid))
-                .map(ResultVO::success);
+                .thenReturn(ResultVO.success());
     }
 
     @PostMapping("items")
     public Mono<ResultVO> addItem(@RequestBody Item item,
                                   @RequestAttribute(TokenAttribute.COLLID) long collid) {
         return itemService.addItem(item)
-                .then(Mono.defer(() -> itemService.listItems(item.getCatId())))
-                .map(ResultVO::success);
+                .thenReturn(ResultVO.success());
     }
 
     // 重置密码

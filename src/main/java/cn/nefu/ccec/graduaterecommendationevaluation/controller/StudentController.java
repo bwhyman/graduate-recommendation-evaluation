@@ -48,7 +48,7 @@ public class StudentController {
     @GetMapping("items/{parentitemid}")
     public Mono<ResultVO> getItems(@PathVariable long parentitemid,
                                    @RequestAttribute(TokenAttribute.CATID) long catid) {
-        return itemService.listItemstest(catid, parentitemid)
+        return itemService.listItems(catid, parentitemid)
                 .map(ResultVO::success);
 
     }
@@ -81,9 +81,8 @@ public class StudentController {
     }
 
 
-    @PostMapping("studentitems/{rootitemid}")
+    @PostMapping("studentitems")
     public Mono<ResultVO> postStudentItems(
-            @PathVariable long rootitemid,
             @RequestBody StudentItem studentItem,
             @RequestAttribute(TokenAttribute.UID) long uid,
             @RequestAttribute(TokenAttribute.CATID) long catid) {
@@ -98,15 +97,13 @@ public class StudentController {
                             .comment(studentItem.getComment())
                             .build();
                     return studentItemService.addStudentItem(stuI)
-                            .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid))
-                                    .map(ResultVO::success));
+                            .thenReturn(ResultVO.success());
                 }).defaultIfEmpty(ResultVO.error(Code.ERROR, "指标项不存在"));
     }
 
-    @PostMapping("studentitems/{stuitemid}/files/rootitems/{rootitemid}")
+    @PostMapping("studentitems/{stuitemid}/files")
     public Mono<ResultVO> postStudentFiles(
             @PathVariable long stuitemid,
-            @PathVariable long rootitemid,
             Mono<FilePart> uploadFile,
             @RequestAttribute(TokenAttribute.UID) long uid,
             @RequestAttribute(TokenAttribute.MAGORID) long majorid) {
@@ -133,8 +130,8 @@ public class StudentController {
                                                     .filename(path.getFileName().toString())
                                                     .build()))
                                     .flatMap(sf -> studentItemService.updateStatus(uid, StudentItem.Status.PENDING_REVIEW))
-                                    .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
-                                            .map(ResultVO::success)));
+                                    .then()
+                                    .thenReturn(ResultVO.success());
                         }
                 )
                 .defaultIfEmpty(ResultVO.error(Code.ERROR, "指标项不存在"));
@@ -165,9 +162,8 @@ public class StudentController {
     }
 
 
-    @DeleteMapping("studentitems/{rootitemid}/files/{fileid}")
+    @DeleteMapping("studentitems/files/{fileid}")
     public Mono<ResultVO> deleteFiles(
-            @PathVariable long rootitemid,
             @PathVariable long fileid,
             @RequestAttribute(TokenAttribute.UID) long uid) {
         return studentItemService.getFilePath(uid, fileid)
@@ -175,16 +171,14 @@ public class StudentController {
                 .flatMap(removed -> {
                     if (removed) {
                         return studentItemService.removeStudentItemFile(fileid)
-                                .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
-                                        .map(ResultVO::success)));
+                                .thenReturn(ResultVO.success());
                     }
                     return Mono.just(ResultVO.error(Code.ERROR, "文件移除失败"));
                 });
     }
 
-    @DeleteMapping("studentitems/{rootitemid}/sitems/{stuitemid}")
+    @DeleteMapping("studentitems/{stuitemid}")
     public Mono<ResultVO> deleteStudentItems(
-            @PathVariable long rootitemid,
             @PathVariable long stuitemid,
             @RequestAttribute(TokenAttribute.UID) long uid) {
         return studentItemService.getStudentItem(uid, stuitemid)
@@ -193,19 +187,17 @@ public class StudentController {
                         .map(file -> Path.of(file.getPath(), file.getFilename()))
                         .flatMap(fileService::removeFile)
                         .flatMap(removed -> studentItemService.removeStudentItemFiles(stuitemid))
-                        .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
-                                .map(ResultVO::success)))));
+                        .then(Mono.just(ResultVO.success())))
+                );
     }
 
-    @PatchMapping("studentitems/{rootitemid}/sitems/{stuitemid}")
+    @PatchMapping("studentitems/{stuitemid}")
     public Mono<ResultVO> updateStudentItems(
-            @PathVariable long rootitemid,
             @PathVariable long stuitemid,
             @RequestBody StudentItem studentItem,
             @RequestAttribute(TokenAttribute.UID) long uid) {
         return studentItemService.updateStudentItem(uid, stuitemid, studentItem.getName(), studentItem.getComment(), StudentItem.Status.PENDING_REVIEW)
-                .then(Mono.defer(() -> studentItemService.listStudentItems(uid, rootitemid)
-                        .map(ResultVO::success)));
+                .thenReturn(ResultVO.success());
     }
 
     @GetMapping("statuses")

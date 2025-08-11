@@ -35,14 +35,6 @@ public class ItemService {
         return itemRepository.findTopByCatId(catid).collectList();
     }
 
-    //@Cacheable(value = "items", key = "#parentid")
-    /*@Deprecated
-    public Mono<List<Item>> listItems(long catid, long parentid) {
-        return itemRepository.findByCatIdAndParentId(catid, parentid)
-                .collectList()
-                .cache();
-    }*/
-
     /**
      * ，不直接返回，按子节点封装
      *
@@ -50,8 +42,8 @@ public class ItemService {
      * @param parentid
      * @return
      */
-    @Cacheable(value = "items", key = "#parentid")
-    public Mono<ItemDTO> listItemstest(long catid, long parentid) {
+   // @Cacheable(value = "items", key = "#parentid")
+    public Mono<ItemDTO> listItems(long catid, long parentid) {
         return itemRepository.findByCatIdAndParentId(catid, parentid)
                 .collectList()
                 .map(items -> convertToItemDTO(items, parentid))
@@ -132,7 +124,7 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value = "items", key = "#catid")
+    //@Cacheable(value = "items", key = "#catid")
     public Mono<List<ItemDTO>> listItems(long catid) {
         return itemRepository.findByCatId(catid)
                 .collectList()

@@ -74,8 +74,7 @@ public class CategoryAdminController {
         req.getLog().setUserId(uid);
         return studentItemService.checkUserCategoryAuth(sid, uid)
                 .flatMap(r -> weightedScoreService.updateWeightedScore(sid, req.getWeightedScore().getScore(), req.getWeightedScore().getRanking(), WeightedScore.VERIFIED, req.getLog()))
-                .then(Mono.defer(() -> weightedScoreService.getWeightedScore(sid)))
-                .map(ResultVO::success);
+                .thenReturn(ResultVO.success());
     }
 
     @GetMapping("students/{sid}/studentitems")
@@ -95,8 +94,7 @@ public class CategoryAdminController {
         req.getLog().setUserId(uid);
         return studentItemService.checkUserCategoryAuth(sid, uid)
                 .flatMap(r -> studentItemService.updteStudentItem(req.getStudentItem(), req.getLog()))
-                .then(Mono.defer(() -> studentItemService.getStudentItemDTOs(sid)))
-                .map(ResultVO::success);
+                .thenReturn(ResultVO.success());
     }
 
     @GetMapping("studentitems/files/{fileid}")
