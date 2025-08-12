@@ -3,7 +3,6 @@ package cn.nefu.ccec.graduaterecommendationevaluation.controller;
 import cn.nefu.ccec.graduaterecommendationevaluation.component.JWTComponent;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.User;
 import cn.nefu.ccec.graduaterecommendationevaluation.exception.Code;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.CategoryService;
 import cn.nefu.ccec.graduaterecommendationevaluation.service.UserService;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.ResultVO;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.TokenAttribute;
@@ -26,7 +25,6 @@ import java.util.Map;
 @Slf4j
 public class LoginController {
     private final UserService userService;
-    private final CategoryService categoryService;
     private final JWTComponent jwtComponent;
     private final PasswordEncoder passwordEncoder;
 
@@ -45,7 +43,7 @@ public class LoginController {
                     if (u.getMajorId() != null) {
                         map.put(TokenAttribute.MAGORID, u.getMajorId());
                     }
-                    if(u.getCatId() != null) {
+                    if (u.getCatId() != null) {
                         map.put(TokenAttribute.CATID, u.getCatId());
                     }
                     response.getHeaders().add("role", u.getRole());

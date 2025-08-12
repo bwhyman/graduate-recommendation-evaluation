@@ -5,6 +5,8 @@ import cn.nefu.ccec.graduaterecommendationevaluation.dox.Item;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Major;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.User;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.RegisterUserDTO;
+import cn.nefu.ccec.graduaterecommendationevaluation.exception.Code;
+import cn.nefu.ccec.graduaterecommendationevaluation.exception.XException;
 import cn.nefu.ccec.graduaterecommendationevaluation.service.*;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.ResultVO;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.TokenAttribute;
@@ -73,7 +75,12 @@ public class CollegeAdminController {
     public Mono<ResultVO> putPassword(@PathVariable String account,
                                       @RequestAttribute(TokenAttribute.COLLID) long collid) {
         return collegeService.updatePassword(collid, account)
-                .thenReturn(ResultVO.success());
+                .filter(r -> r > 0)
+                .map(r -> ResultVO.success())
+                .switchIfEmpty(Mono.error(XException.builder()
+                        .codeN(Code.ERROR)
+                        .message("密码重置错误，账号: " + account + "，不存在")
+                        .build()));
     }
 
 }

@@ -34,7 +34,7 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     @Query("""
             update user u set u.password=:password where u.coll_id=:collid and u.account=:account;
             """)
-    Mono<Void> updatePassword(long collid, String account, String password);
+    Mono<Integer> updatePassword(long collid, String account, String password);
 
     @Query("""
             select concat_ws('-', u.name, u.account) from user u where u.id=:uid;

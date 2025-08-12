@@ -1,5 +1,7 @@
 package cn.nefu.ccec.graduaterecommendationevaluation.service;
 
+import cn.nefu.ccec.graduaterecommendationevaluation.exception.Code;
+import cn.nefu.ccec.graduaterecommendationevaluation.exception.XException;
 import cn.nefu.ccec.graduaterecommendationevaluation.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,7 +16,7 @@ public class CollegeService {
     private final PasswordEncoder passwordEncoder;
     private final TransactionalOperator transactionalOperator;
 
-    public Mono<Void> updatePassword(long collid, String account) {
+    public Mono<Integer> updatePassword(long collid, String account) {
         return userRepository.updatePassword(collid, account, passwordEncoder.encode(account))
                 .as(transactionalOperator::transactional);
     }
