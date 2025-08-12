@@ -8,13 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface MajorRepository extends ReactiveCrudRepository<Major,Long> {
-
-    @Query("""
-            select t1.* from major t1, user_category t2
-            where t1.cat_id=t2.cat_id and t2.cat_id=:catid and t2.user_id=:uid;
-            """)
-    Flux<Major> findByCatId(long uid, long catid);
+public interface MajorRepository extends ReactiveCrudRepository<Major, Long> {
 
     @Query("""
             select t1.* from major t1 where t1.cat_id=:catid;

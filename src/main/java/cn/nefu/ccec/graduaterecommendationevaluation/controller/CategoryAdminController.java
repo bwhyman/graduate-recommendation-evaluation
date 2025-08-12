@@ -38,14 +38,15 @@ public class CategoryAdminController {
     @GetMapping("categories/{catid}/majors")
     public Mono<ResultVO> getMajors(@PathVariable long catid,
                                     @RequestAttribute(TokenAttribute.UID) long uid) {
-        return categoryService.listMajors(uid, catid)
+
+        return categoryService.checkInCateory(uid, catid)
+                .flatMap(r -> categoryService.listMajors(catid))
                 .map(ResultVO::success);
     }
 
     // 加载指定专业下所有学生提交状态
     @GetMapping("majors/{majorid}/students/statuses")
-    public Mono<ResultVO> getUsers(@PathVariable long majorid,
-                                   @RequestAttribute(TokenAttribute.UID) long uid) {
+    public Mono<ResultVO> getUsers(@PathVariable long majorid) {
         return studentItemService.listStudentsInfos(majorid)
                 .map(ResultVO::success);
     }

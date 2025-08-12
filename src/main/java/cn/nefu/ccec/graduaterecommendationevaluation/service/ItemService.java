@@ -30,19 +30,19 @@ public class ItemService {
                 .as(transactionalOperator::transactional);
     }
 
-    @Cacheable(value = "items", key = "#catid")
+    @Cacheable(value = "items", key = "'top-' + #catid")
     public Mono<List<Item>> listTopItems(long catid) {
         return itemRepository.findTopByCatId(catid).collectList();
     }
 
     /**
-     * ，不直接返回，按子节点封装
+     * 学生，基于类别，一级指标，加载封装的二级指标
      *
      * @param catid
      * @param parentid
      * @return
      */
-   // @Cacheable(value = "items", key = "#parentid")
+   @Cacheable(value = "items", key = "#catid+#parentid")
     public Mono<ItemDTO> listItems(long catid, long parentid) {
         return itemRepository.findByCatIdAndParentId(catid, parentid)
                 .collectList()
@@ -124,7 +124,8 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
-    //@Cacheable(value = "items", key = "#catid")
+    // 管理员，基于类别加载全部指标项
+    @Cacheable(value = "items", key = "#catid")
     public Mono<List<ItemDTO>> listItems(long catid) {
         return itemRepository.findByCatId(catid)
                 .collectList()

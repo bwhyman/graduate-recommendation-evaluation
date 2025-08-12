@@ -23,6 +23,9 @@ public class ResultVO {
     }
 
     public static ResultVO success(Object data) {
+        if (data == null) {
+            data = Map.of();
+        }
         return ResultVO.builder().code(200).data(data).build();
     }
 

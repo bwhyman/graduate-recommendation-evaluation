@@ -163,7 +163,7 @@ public class StudentItemService {
     }
 
     public Mono<Boolean> checkUserCategoryAuth(long sid, long adminid) {
-        return userCategoryRepository.checkUserCategory(sid, adminid)
+        return userCategoryRepository.checkUsersInSameCategory(sid, adminid)
                 .hasElement();
     }
 

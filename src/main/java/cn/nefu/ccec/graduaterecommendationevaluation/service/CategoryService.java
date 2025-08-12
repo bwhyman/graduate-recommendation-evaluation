@@ -4,10 +4,7 @@ import cn.nefu.ccec.graduaterecommendationevaluation.dox.Category;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.Major;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.CategoryDTO;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.CollegeDTO;
-import cn.nefu.ccec.graduaterecommendationevaluation.repository.CategoryRepository;
-import cn.nefu.ccec.graduaterecommendationevaluation.repository.CollegeRepository;
-import cn.nefu.ccec.graduaterecommendationevaluation.repository.MajorRepository;
-import cn.nefu.ccec.graduaterecommendationevaluation.repository.UserRepository;
+import cn.nefu.ccec.graduaterecommendationevaluation.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final UserCategoryRepository userCategoryRepository;
     private final MajorRepository majorRepository;
     private final CollegeRepository collegeRepository;
     private final TransactionalOperator transactionalOperator;
@@ -77,15 +75,21 @@ public class CategoryService {
                 );
     }
 
-    @CacheEvict(value = "category", allEntries = true)
+    @CacheEvict(value = {"category", "majors"}, allEntries = true)
     public Mono<Void> addMajor(Major major) {
         return majorRepository.save(major)
                 .then()
                 .as(transactionalOperator::transactional);
     }
 
-    public Mono<List<Major>> listMajors(long uid, long catid) {
-        return majorRepository.findByCatId(uid,catid)
+    @Cacheable(value = "majors", key = "#catid")
+    public Mono<List<Major>> listMajors(long catid) {
+        return majorRepository.findByCatId(catid)
                 .collectList();
+    }
+    // 检测用户是否在类别下
+    public Mono<Boolean> checkInCateory(long uid,long catid) {
+        return userCategoryRepository.checkInCategory(uid, catid)
+                .hasElement();
     }
 }
