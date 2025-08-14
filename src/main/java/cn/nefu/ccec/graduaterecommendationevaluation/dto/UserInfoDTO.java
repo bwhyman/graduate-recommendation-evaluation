@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class UserInfoDTO {
     private String name;
     private String collName;
-    private String catNames;
+    private String categories;
     private String majorName;
 }
