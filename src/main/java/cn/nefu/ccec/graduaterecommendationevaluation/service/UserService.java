@@ -65,4 +65,9 @@ public class UserService {
                 .as(transactionalOperator::transactional);
     }
 
+    public Mono<Integer> resetPassword(long collid, String account) {
+        return userRepository.updatePassword(collid, account, passwordEncoder.encode(account))
+                .as(transactionalOperator::transactional);
+    }
+
 }

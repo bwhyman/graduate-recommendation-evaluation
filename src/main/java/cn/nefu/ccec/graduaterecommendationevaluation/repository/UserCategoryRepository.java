@@ -9,12 +9,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface UserCategoryRepository extends ReactiveCrudRepository<UserCategory,Long> {
+public interface UserCategoryRepository extends ReactiveCrudRepository<UserCategory, Long> {
 
     @Query("""
-            select count(*) from user_category t1 join user_category t2
+            select exists(
+            select 1 from user_category t1 join user_category t2
             on t1.cat_id=t2.cat_id
-            where t1.user_id=:sid and t2.user_id=:adminid;
+            where t1.user_id=:sid and t2.user_id=:adminid);
             """)
     Mono<Integer> checkUsersInSameCategory(long sid, long adminid);
 
@@ -26,7 +27,7 @@ public interface UserCategoryRepository extends ReactiveCrudRepository<UserCateg
     Flux<AdminDO> findByCollId(long collid, String role);
 
     @Query("""
-            select count(*) from user_category t1 where t1.cat_id=:cid and t1.user_id=:uid;
+            select exists(select 1 from user_category t1 where t1.cat_id=:cid and t1.user_id=:uid);
             """)
     Mono<Integer> checkInCategory(long uid, long cid);
 }

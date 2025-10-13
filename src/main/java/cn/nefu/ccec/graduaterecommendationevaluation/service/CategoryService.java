@@ -50,10 +50,16 @@ public class CategoryService {
                 .flatMap(this::listByCatids);
     }
 
-    public Mono<List<Category>> listCategories(long uid) {
+    public Mono<List<Category>> listCategoriesByUid(long uid) {
         return categoryRepository.findByUid(uid)
                 .collectList();
     }
+
+    public Mono<List<Category>> listCategoriesByCollid(long collid) {
+        return categoryRepository.findByCollId(collid)
+                .collectList();
+    }
+
 
     private Mono<List<CategoryDTO>> listByCatids(List<Long> catids) {
         return Flux.fromIterable(catids)

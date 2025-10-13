@@ -16,7 +16,7 @@ public class PasswordTest {
 
     @Test
     void test() {
-        var str = "1000002720";
+        var str = "2022212953";
         String encode = encoder.encode(str);
         log.debug(encode);
     }

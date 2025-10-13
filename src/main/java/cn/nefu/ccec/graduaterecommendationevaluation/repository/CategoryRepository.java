@@ -19,4 +19,6 @@ public interface CategoryRepository extends ReactiveCrudRepository<Category, Lon
             where t1.id=t2.cat_id and t2.user_id=:uid
             """)
     Flux<Category> findByUid(long uid);
+
+    Flux<Category> findByCollId(long collid);
 }

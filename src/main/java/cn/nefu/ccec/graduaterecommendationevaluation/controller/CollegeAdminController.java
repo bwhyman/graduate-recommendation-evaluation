@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class CollegeAdminController {
     private final CategoryService categoryService;
-    private final CollegeService collegeService;
     private final UserService userService;
     private final ItemService itemService;
     private final AdminService adminService;
@@ -74,7 +73,7 @@ public class CollegeAdminController {
     @PutMapping("passwords/{account}")
     public Mono<ResultVO> putPassword(@PathVariable String account,
                                       @RequestAttribute(TokenAttribute.COLLID) long collid) {
-        return collegeService.updatePassword(collid, account)
+        return userService.resetPassword(collid, account)
                 .filter(r -> r > 0)
                 .map(r -> ResultVO.success())
                 .switchIfEmpty(Mono.error(XException.builder()

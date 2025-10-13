@@ -1,5 +1,6 @@
 package cn.nefu.ccec.graduaterecommendationevaluation.controller;
 
+import cn.nefu.ccec.graduaterecommendationevaluation.dox.User;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.WeightedScore;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.ComfirmWeightedScoreReq;
 import cn.nefu.ccec.graduaterecommendationevaluation.dto.StudentItemReq;
@@ -30,8 +31,15 @@ public class CategoryAdminController {
     private final FileService fileService;
 
     @GetMapping("categories")
-    public Mono<ResultVO> getCategories(@RequestAttribute(TokenAttribute.UID) long uid) {
-        return categoryService.listCategories(uid)
+    public Mono<ResultVO> getCategories(
+            @RequestAttribute(TokenAttribute.UID) long uid,
+            @RequestAttribute(TokenAttribute.ROLE) String role,
+            @RequestAttribute(TokenAttribute.COLLID) long collid) {
+        if (role.equals(User.COLLAGE_ADMIN)) {
+            return categoryService.listCategoriesByCollid(collid)
+                    .map(ResultVO::success);
+        }
+        return categoryService.listCategoriesByUid(uid)
                 .map(ResultVO::success);
     }
 
