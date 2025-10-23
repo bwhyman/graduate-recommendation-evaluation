@@ -15,7 +15,7 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
 
     @Query("""
             select t1.id, t1.name, t2.name as coll_name,
-            json_arrayagg(json_insert(t4.weighting, '$.id', cast(t4.id as char), '$.name', t4.name)) as categories,
+            json_arrayagg(case when t4.name is null then '' end ) as categories,
             t5.name as major_name
             from user t1
                      left join college t2 on t1.coll_id = t2.id
@@ -25,6 +25,35 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
             where t1.id=:id group by t1.id;
             """)
     Mono<UserInfoDTO> find(long id);
+
+    @Query("""
+           select t1.id, t1.name, t2.name as coll_name, JSON_ARRAYAGG(t3.name) as categories
+           from user t1
+           left join college t2 on t1.coll_id = t2.id
+           left join category t3 on t3.coll_id=t2.id
+           where t1.id=:id;
+           """)
+    Mono<UserInfoDTO> findCollegeAdminUserInfo(long id);
+
+    @Query("""
+            select t1.id, t1.name, t2.name as coll_name, JSON_ARRAYAGG(t3.name) as categories
+            from user t1
+            left join college t2 on t1.coll_id = t2.id
+            left join category t3 on t3.coll_id=t2.id
+            left join user_category t4 on t4.user_id=:id
+            where t1.id=:id;
+            """)
+    Mono<UserInfoDTO> findCategoryAdminUserInfo(long id);
+
+    @Query("""
+            select t1.id, t1.name, t2.name as coll_name, JSON_ARRAYAGG(t3.name) as categories, t4.name as major_name
+            from user t1
+            left join college t2 on t1.coll_id = t2.id
+            left join category t3 on t3.id=t1.cat_id
+            left join major t4 on t4.id=t1.major_id
+            where t1.id=:id;
+            """)
+    Mono<UserInfoDTO> findStudentUserInfo(long id);
 
     @Modifying
     @Query("""

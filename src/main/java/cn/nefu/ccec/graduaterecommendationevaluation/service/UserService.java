@@ -26,8 +26,16 @@ public class UserService {
         return userRepository.findByAccount(account);
     }
 
-    public Mono<UserInfoDTO> getUserInfo(long id) {
-        return userRepository.find(id);
+    public Mono<UserInfoDTO> getCollegeAdminUserInfo(long id) {
+        return userRepository.findCollegeAdminUserInfo(id);
+    }
+
+    public Mono<UserInfoDTO> getCategoryAdminUserInfo(long id) {
+        return userRepository.findCategoryAdminUserInfo(id);
+    }
+
+    public Mono<UserInfoDTO> getStudentUserInfo(long id) {
+        return userRepository.findStudentUserInfo(id);
     }
 
     public Mono<Void> updatePassword(long uid, String password) {

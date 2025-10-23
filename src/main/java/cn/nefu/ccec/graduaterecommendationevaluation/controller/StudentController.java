@@ -5,10 +5,7 @@ import cn.nefu.ccec.graduaterecommendationevaluation.dox.StudentItemFile;
 import cn.nefu.ccec.graduaterecommendationevaluation.dox.WeightedScore;
 import cn.nefu.ccec.graduaterecommendationevaluation.exception.Code;
 import cn.nefu.ccec.graduaterecommendationevaluation.exception.XException;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.FileService;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.ItemService;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.StudentItemService;
-import cn.nefu.ccec.graduaterecommendationevaluation.service.WeightedScoreService;
+import cn.nefu.ccec.graduaterecommendationevaluation.service.*;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.ResultVO;
 import cn.nefu.ccec.graduaterecommendationevaluation.vo.TokenAttribute;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +32,7 @@ public class StudentController {
     private final WeightedScoreService weightedScoreService;
     private final StudentItemService studentItemService;
     private final FileService fileService;
+    private final CategoryService categoryService;
 
     // 获取一级指标
     @GetMapping("topitems")
@@ -212,6 +210,12 @@ public class StudentController {
             @PathVariable long stuitemid,
             @RequestAttribute(TokenAttribute.UID) long uid) {
         return studentItemService.listStudentItemLogs(uid, stuitemid)
+                .map(ResultVO::success);
+    }
+
+    @GetMapping("category")
+    public Mono<ResultVO> getCategoryWeighting(@RequestAttribute(TokenAttribute.CATID) long catid) {
+        return categoryService.getCategory(catid)
                 .map(ResultVO::success);
     }
 }

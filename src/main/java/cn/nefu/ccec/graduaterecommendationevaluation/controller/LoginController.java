@@ -31,8 +31,10 @@ public class LoginController {
     @PostMapping("login")
     public Mono<ResultVO> login(@RequestBody User userLogin, ServerHttpResponse response) {
         return userService.getUser(userLogin.getAccount())
-                .filter(u -> passwordEncoder.matches(userLogin.getPassword(), u.getPassword()))
-                .flatMap(u -> {
+                .map(u -> {
+                    if(!passwordEncoder.matches(userLogin.getPassword(), u.getPassword())) {
+                        return ResultVO.error(Code.LOGIN_ERROR);
+                    }
                     var role = u.getRole();
                     Map<String, Object> map = new HashMap<>();
                     map.put(TokenAttribute.UID, u.getId());
@@ -48,8 +50,7 @@ public class LoginController {
                     }
                     response.getHeaders().add("role", u.getRole());
                     response.getHeaders().add("token", jwtComponent.encode(map));
-                    return userService.getUserInfo(u.getId());
-                }).map(ResultVO::success)
-                .defaultIfEmpty(ResultVO.error(Code.LOGIN_ERROR));
+                    return ResultVO.success();
+                });
     }
 }

@@ -93,9 +93,13 @@ public class CategoryService {
         return majorRepository.findByCatId(catid)
                 .collectList();
     }
-    // 检测用户是否在类别下
+    // 检测类别管理员是否在类别下
     public Mono<Boolean> checkInCateory(long uid,long catid) {
         return userCategoryRepository.checkInCategory(uid, catid)
                 .hasElement();
+    }
+
+    public Mono<Category> getCategory(long catid) {
+        return categoryRepository.findById(catid);
     }
 }

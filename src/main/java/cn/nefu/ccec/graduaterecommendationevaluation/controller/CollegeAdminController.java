@@ -50,6 +50,7 @@ public class CollegeAdminController {
     @PostMapping("categories")
     public Mono<ResultVO> addCategory(@RequestBody Category category,
                                       @RequestAttribute(TokenAttribute.COLLID) long collid) {
+        category.setCollId(collid);
         return categoryService.addCategory(category)
                 .thenReturn(ResultVO.success());
     }
