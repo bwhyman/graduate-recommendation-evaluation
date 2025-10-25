@@ -51,6 +51,7 @@ public class LoginController {
                     response.getHeaders().add("role", u.getRole());
                     response.getHeaders().add("token", jwtComponent.encode(map));
                     return ResultVO.success();
-                });
+                })
+                .switchIfEmpty(Mono.just(ResultVO.error(Code.LOGIN_ERROR)));
     }
 }
