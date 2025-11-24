@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
@@ -151,8 +152,9 @@ public class StudentController {
         return studentItemService.getFilePath(uid, fileid)
                 .flatMapMany(filepath -> fileService.getSize(filepath)
                         .flatMapMany(size -> {
-                            String name = URLEncoder.encode(filepath.getFileName().toString(), StandardCharsets.UTF_8);
+                            var name = URLEncoder.encode(filepath.getFileName().toString(), StandardCharsets.UTF_8);
                             HttpHeaders headers = response.getHeaders();
+                            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
                             headers.set("filename", name);
                             headers.setContentLength(size);
                             return fileService.downloadFile(filepath);
